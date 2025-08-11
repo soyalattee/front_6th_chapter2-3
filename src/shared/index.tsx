@@ -1,0 +1,10 @@
+// UI 컴포넌트
+export { Button } from "./ui/Button"
+export { Input } from "./ui/Input"
+export { Textarea } from "./ui/Textarea"
+export { Card, CardHeader, CardTitle, CardContent } from "./ui/Card"
+export { Footer } from "./ui/Footer"
+export { Header } from "./ui/Header"
+export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/Select"
+export { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/Dialog"
+export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "./ui/Table"

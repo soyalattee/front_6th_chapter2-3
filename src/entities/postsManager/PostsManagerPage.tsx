@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
   Textarea,
-} from "../../entities"
+} from "../../shared"
 
 const PostsManager = () => {
   const navigate = useNavigate()
