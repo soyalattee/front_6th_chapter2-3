@@ -1,5 +1,5 @@
-import Header from "@/entities/Header"
-import Footer from "@/entities/Footer"
+import Header from "@/shared/Header"
+import Footer from "@/shared/Footer"
 
 interface LayoutProps {
   children: React.ReactNode
