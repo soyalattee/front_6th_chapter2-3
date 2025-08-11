@@ -1,5 +1,5 @@
 import { Layout } from "@/widgets"
-import PostsManager from "@/entities/PostsManagerPage"
+import PostsManager from "@/entities/postsManager/PostsManagerPage"
 
 const PostsManagerPage = () => {
   return (
