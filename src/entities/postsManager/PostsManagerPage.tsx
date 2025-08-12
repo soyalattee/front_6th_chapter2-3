@@ -21,7 +21,7 @@ import {
   Textarea,
 } from "../../shared"
 
-const PostsManager = () => {
+export const PostsManagerComponent = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
@@ -700,5 +700,3 @@ const PostsManager = () => {
     </Card>
   )
 }
-
-export default PostsManager

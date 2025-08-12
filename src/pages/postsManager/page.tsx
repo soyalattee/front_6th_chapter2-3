@@ -1,12 +1,10 @@
 import { Layout } from "@/widgets"
-import PostsManager from "@/entities/postsManager/PostsManagerPage"
+import { PostsManagerComponent } from "@/entities"
 
-const PostsManagerPage = () => {
+export const PostsManagerPage = () => {
   return (
     <Layout>
-      <PostsManager />
+      <PostsManagerComponent />
     </Layout>
   )
 }
-
-export default PostsManagerPage
