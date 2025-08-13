@@ -10,18 +10,9 @@ import {
 } from "@/shared"
 import { Plus, ThumbsUp, Edit2, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
-
+import { Comment } from "../../postsManager/apis/postsApis"
 interface CommentsProps {
-  postId: string
-}
-interface Comment {
-  id: string
-  body: string
-  likes: number
-  user: {
-    id: string
-    username: string
-  }
+  postId: number
 }
 interface Comments {
   [key: string]: Comment[] //postId에 대한 댓글 배열
