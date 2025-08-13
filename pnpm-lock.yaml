@@ -8,9 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@tanstack/react-query':
+        specifier: ^5.85.0
+        version: 5.85.0(react@19.1.1)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      nuqs:
+        specifier: ^2.4.3
+        version: 2.4.3(react-router-dom@7.8.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react-router@7.8.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1)
       react:
         specifier: ^19.1.1
         version: 19.1.1
@@ -932,6 +938,14 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@tanstack/query-core@5.83.1':
+    resolution: {integrity: sha512-OG69LQgT7jSp+5pPuCfzltq/+7l2xoweggjme9vlbCPa/d7D7zaqv5vN/S82SzSYZ4EDLTxNO1PWrv49RAS64Q==}
+
+  '@tanstack/react-query@5.85.0':
+    resolution: {integrity: sha512-t1HMfToVMGfwEJRya6GG7gbK0luZJd+9IySFNePL1BforU1F3LqQ3tBC2Rpvr88bOrlU6PXyMLgJD0Yzn4ztUw==}
+    peerDependencies:
+      react: ^18 || ^19
+
   '@testing-library/dom@10.4.0':
     resolution: {integrity: sha512-pemlzrSESWbdAloYml3bAJMEfNh1Z7EduzqPKprCH5S341frlpYnUEW0H72dLxa6IsYr+mPno20GiSm+h9dEdQ==}
     engines: {node: '>=18'}
@@ -1746,6 +1760,9 @@ packages:
     resolution: {integrity: sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==}
     engines: {node: '>=16 || 14 >=14.17'}
 
+  mitt@3.0.1:
+    resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
+
   mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
     engines: {node: '>=10'}
@@ -1777,6 +1794,24 @@ packages:
 
   node-releases@2.0.18:
     resolution: {integrity: sha512-d9VeXT4SJ7ZeOqGX6R5EM022wpL+eWPooLI+5UpWn2jCT1aosUQEhQP214x33Wkwx3JQMvIm+tIoVOdodFS40g==}
+
+  nuqs@2.4.3:
+    resolution: {integrity: sha512-BgtlYpvRwLYiJuWzxt34q2bXu/AIS66sLU1QePIMr2LWkb+XH0vKXdbLSgn9t6p7QKzwI7f38rX3Wl9llTXQ8Q==}
+    peerDependencies:
+      '@remix-run/react': '>=2'
+      next: '>=14.2.0'
+      react: '>=18.2.0 || ^19.0.0-0'
+      react-router: ^6 || ^7
+      react-router-dom: ^6 || ^7
+    peerDependenciesMeta:
+      '@remix-run/react':
+        optional: true
+      next:
+        optional: true
+      react-router:
+        optional: true
+      react-router-dom:
+        optional: true
 
   nwsapi@2.2.16:
     resolution: {integrity: sha512-F1I/bimDpj3ncaNDhfyMWuFqmQDBwDB0Fogc2qpL3BWvkQteFD/8BzWuIRl83rq0DXfm8SGt/HFhLXZyljTXcQ==}
@@ -3080,6 +3115,13 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.46.2':
     optional: true
 
+  '@tanstack/query-core@5.83.1': {}
+
+  '@tanstack/react-query@5.85.0(react@19.1.1)':
+    dependencies:
+      '@tanstack/query-core': 5.83.1
+      react: 19.1.1
+
   '@testing-library/dom@10.4.0':
     dependencies:
       '@babel/code-frame': 7.27.1
@@ -3941,6 +3983,8 @@ snapshots:
     dependencies:
       brace-expansion: 2.0.1
 
+  mitt@3.0.1: {}
+
   mrmime@2.0.0: {}
 
   ms@2.1.3: {}
@@ -3977,6 +4021,14 @@ snapshots:
   natural-compare@1.4.0: {}
 
   node-releases@2.0.18: {}
+
+  nuqs@2.4.3(react-router-dom@7.8.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react-router@7.8.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1):
+    dependencies:
+      mitt: 3.0.1
+      react: 19.1.1
+    optionalDependencies:
+      react-router: 7.8.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      react-router-dom: 7.8.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
 
   nwsapi@2.2.16: {}
 
