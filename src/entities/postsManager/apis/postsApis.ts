@@ -53,13 +53,6 @@ export interface PostsResponse {
   skip: number
 }
 
-export interface CommentsResponse {
-  comments: Comment[]
-  limit: number
-  skip: number
-  total: number
-}
-
 export type Post = {
   id: number
   body: string
@@ -72,8 +65,6 @@ export type Post = {
 
 export type Tag = { url: string; slug: string; name: string }
 export type TagsResponse = Tag[]
-export type CommentUser = { id: number; username: string; fullName: string }
-export type Comment = { id: number; body: string; likes: number; postId: number; user: CommentUser }
 
 // API 함수
 
@@ -114,11 +105,6 @@ export const addPost = async (post: { title: string; body: string; userId: numbe
 // 게시물 수정
 export const updatePost = async (post: Post): Promise<Post> => {
   return api.put<Post, Post>(`/posts/${post.id}`, post)
-}
-
-// 게시물 댓글 가져오기
-export const getCommentsByPostId = async (postId: number): Promise<CommentsResponse> => {
-  return api.get<CommentsResponse>(`/comments/post/${postId}`)
 }
 
 //  ai 가 짠거

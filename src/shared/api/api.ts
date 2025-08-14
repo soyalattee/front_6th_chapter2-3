@@ -35,4 +35,8 @@ export const api = {
     const response = await apiClient.delete<T>(path, options)
     return response.data
   },
+  patch: async <T, D>(path: string, data?: D, options?: AxiosRequestConfig): Promise<T> => {
+    const response = await apiClient.patch<T>(path, data, options)
+    return response.data
+  },
 }
