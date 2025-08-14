@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "@/shared"
-import { PostWithAuthor } from "../PostsManagerPage"
-import { Post, updatePost } from "./postsApis"
+import { PostWithAuthor } from "./PostsManagerPage"
+import { Post, updatePost } from "./apis/postsApis"
 
 interface EditPostDialogProps {
   showEditDialog: boolean

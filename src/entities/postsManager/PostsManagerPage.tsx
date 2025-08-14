@@ -17,7 +17,7 @@ import {
 import { SearchFilterContainer } from "./SearchFilterContainer"
 import { Paginations } from "./Paginations"
 import { AddPostDialog } from "./AddPostDialog"
-import { EditPostDialog } from "./apis/EditPostDialog"
+import { EditPostDialog } from "./EditPostDialog"
 import { PostDetailDialog } from "./PostDetailDialog"
 import { UserDialog } from "./UserDialog"
 
