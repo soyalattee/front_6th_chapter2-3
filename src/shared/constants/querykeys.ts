@@ -1,6 +1,6 @@
 export const QUERY_KEYS = {
   POSTS: ["posts"],
-  USERS: ["users"],
+  USERS: (userId: number | null) => ["users", userId],
   COMMENTS: ["comments"],
   TAGS: ["tags"],
 }

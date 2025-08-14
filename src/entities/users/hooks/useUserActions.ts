@@ -3,11 +3,6 @@ import { useQuery } from "@tanstack/react-query"
 import { getUserById } from "@/entities/users/api/userApis"
 import { QUERY_KEYS } from "@/shared"
 
-export const userQueryKeys = {
-  all: QUERY_KEYS.USERS,
-  byId: (userId: number) => [...QUERY_KEYS.USERS, "byId", userId] as const,
-} as const
-
 export const useUserActions = () => {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
 
@@ -16,9 +11,8 @@ export const useUserActions = () => {
     data: selectedUser = null,
     isLoading: isLoadingUser,
     error,
-    refetch: refetchUser,
   } = useQuery({
-    queryKey: userQueryKeys.byId(selectedUserId!),
+    queryKey: QUERY_KEYS.USERS(selectedUserId),
     queryFn: () => getUserById(selectedUserId!),
     enabled: !!selectedUserId,
   })
@@ -40,6 +34,5 @@ export const useUserActions = () => {
     error,
     selectUser,
     clearSelectedUser,
-    refetchUser,
   }
 }
