@@ -10,21 +10,25 @@ import {
 } from "@/shared"
 import { Plus, ThumbsUp, Edit2, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Comment } from "../../postsManager/apis/postsApis"
+import {
+  addComment,
+  AddCommentRequest,
+  Comment,
+  deleteComment,
+  getCommentsByPostId,
+  likeComment,
+  updateComment,
+} from "../api/commentsApis"
+
 interface CommentsProps {
   postId: number
 }
 
-interface NewComment {
-  body: string
-  postId: number | null
-  userId: number
-}
 // 댓글 렌더링
 export const Comments = ({ postId }: CommentsProps) => {
   const { searchQuery } = useQueryParams()
   const [comments, setComments] = useState<Record<number, Comment[]>>({})
-  const [newComment, setNewComment] = useState<NewComment>({ body: "", postId: null, userId: 1 })
+  const [newComment, setNewComment] = useState<AddCommentRequest | null>()
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null)
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false)
   const [showEditCommentDialog, setShowEditCommentDialog] = useState(false)
@@ -33,46 +37,37 @@ export const Comments = ({ postId }: CommentsProps) => {
   const fetchComments = async (postId: number) => {
     if (comments[postId]) return // 이미 불러온 댓글이 있으면 다시 불러오지 않음
     try {
-      const response = await fetch(`/api/comments/post/${postId}`)
-      const data = await response.json()
-      setComments((prev) => ({ ...prev, [postId]: data.comments }))
+      const response = await getCommentsByPostId(postId)
+      setComments((prev) => ({ ...prev, [postId]: response.comments }))
     } catch (error) {
       console.error("댓글 가져오기 오류:", error)
     }
   }
 
   // 댓글 추가
-  const addComment = async () => {
+  const handleAddComment = async () => {
+    if (!newComment) return
     try {
-      const response = await fetch("/api/comments/add", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newComment),
-      })
-      const data = await response.json()
+      const response = await addComment(newComment)
+
       setComments((prev) => ({
         ...prev,
-        [data.postId]: [...(prev[data.postId] || []), data],
+        [response.postId]: [...(prev[response.postId] || []), { ...response, likes: 0 }],
       }))
       setShowAddCommentDialog(false)
-      setNewComment({ body: "", postId: null, userId: 1 })
+      setNewComment(null)
     } catch (error) {
       console.error("댓글 추가 오류:", error)
     }
   }
   // 댓글 업데이트
-  const updateComment = async () => {
+  const handleUpdateComment = async () => {
     try {
       if (!selectedComment) return
-      const response = await fetch(`/api/comments/${selectedComment.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: selectedComment.body }),
-      })
-      const data = await response.json()
+      const response = await updateComment(selectedComment.id, { body: selectedComment.body })
       setComments((prev) => ({
         ...prev,
-        [data.postId]: prev[data.postId].map((comment) => (comment.id === data.id ? data : comment)),
+        [response.postId]: prev[response.postId].map((comment) => (comment.id === response.id ? response : comment)),
       }))
       setShowEditCommentDialog(false)
     } catch (error) {
@@ -81,11 +76,9 @@ export const Comments = ({ postId }: CommentsProps) => {
   }
 
   // 댓글 삭제
-  const deleteComment = async (id: number, postId: number) => {
+  const handleDeleteComment = async (id: number, postId: number) => {
     try {
-      await fetch(`/api/comments/${id}`, {
-        method: "DELETE",
-      })
+      await deleteComment(id)
       setComments((prev) => ({
         ...prev,
         [postId]: prev[postId].filter((comment) => comment.id !== id),
@@ -96,20 +89,15 @@ export const Comments = ({ postId }: CommentsProps) => {
   }
 
   // 댓글 좋아요
-  const likeComment = async (id: number, postId: number) => {
+  const handleLikeComment = async (id: number, postId: number) => {
     const comment = comments[postId]?.find((c) => c.id === id)
     if (!comment) return
     try {
-      const response = await fetch(`/api/comments/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ likes: comment.likes + 1 }),
-      })
-      const data = await response.json()
+      const response = await likeComment(id, { likes: comment.likes + 1 })
       setComments((prev) => ({
         ...prev,
         [postId]: prev[postId].map((comment) =>
-          comment.id === data.id ? { ...data, likes: comment.likes + 1 } : comment,
+          comment.id === response.id ? { ...response, likes: comment.likes + 1 } : comment,
         ),
       }))
     } catch (error) {
@@ -134,7 +122,7 @@ export const Comments = ({ postId }: CommentsProps) => {
           <Button
             size="sm"
             onClick={() => {
-              setNewComment((prev) => ({ ...prev, postId }))
+              setNewComment({ body: "", postId, userId: 1 })
               setShowAddCommentDialog(true)
             }}
           >
@@ -152,7 +140,7 @@ export const Comments = ({ postId }: CommentsProps) => {
                 </span>
               </div>
               <div className="flex items-center space-x-1">
-                <Button variant="ghost" size="sm" onClick={() => likeComment(comment.id, postId)}>
+                <Button variant="ghost" size="sm" onClick={() => handleLikeComment(comment.id, postId)}>
                   <ThumbsUp className="w-3 h-3" />
                   <span className="ml-1 text-xs">{comment.likes}</span>
                 </Button>
@@ -166,7 +154,7 @@ export const Comments = ({ postId }: CommentsProps) => {
                 >
                   <Edit2 className="w-3 h-3" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => deleteComment(comment.id, postId)}>
+                <Button variant="ghost" size="sm" onClick={() => handleDeleteComment(comment.id, postId)}>
                   <Trash2 className="w-3 h-3" />
                 </Button>
               </div>
@@ -176,21 +164,23 @@ export const Comments = ({ postId }: CommentsProps) => {
       </div>
 
       {/* 댓글 추가 대화상자 */}
-      <Dialog open={showAddCommentDialog} onOpenChange={setShowAddCommentDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>새 댓글 추가</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Textarea
-              placeholder="댓글 내용"
-              value={newComment.body}
-              onChange={(e) => setNewComment({ ...newComment, body: e.target.value })}
-            />
-            <Button onClick={addComment}>댓글 추가</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {newComment && (
+        <Dialog open={showAddCommentDialog} onOpenChange={setShowAddCommentDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>새 댓글 추가</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <Textarea
+                placeholder="댓글 내용"
+                value={newComment.body}
+                onChange={(e) => setNewComment({ ...newComment, body: e.target.value })}
+              />
+              <Button onClick={handleAddComment}>댓글 추가</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* 댓글 수정 대화상자 */}
       {selectedComment && (
@@ -201,7 +191,7 @@ export const Comments = ({ postId }: CommentsProps) => {
             </DialogHeader>
             <div className="space-y-4">
               <Textarea placeholder="댓글 내용" value={selectedComment?.body || ""} onChange={handleCommentChange} />
-              <Button onClick={updateComment}>댓글 업데이트</Button>
+              <Button onClick={handleUpdateComment}>댓글 업데이트</Button>
             </div>
           </DialogContent>
         </Dialog>

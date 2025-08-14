@@ -1,8 +1,18 @@
 import { api } from "@/shared/api/api"
 
-export type CommentUser = { id: number; username: string; fullName: string }
+export interface CommentUser {
+  id: number
+  username: string
+  fullName: string
+}
 
-export type Comment = { id: number; body: string; likes: number; postId: number; user: CommentUser }
+export interface Comment {
+  id: number
+  body: string
+  likes: number
+  postId: number
+  user: CommentUser
+}
 
 export interface CommentsResponse {
   comments: Comment[]
@@ -17,14 +27,18 @@ export interface AddCommentResponse {
   postId: number
   user: CommentUser
 }
-export interface UpdateCommentResponse extends Comment {
-  user: CommentUser
-}
-export interface DeleteCommentResponse extends Comment {
+export interface DeleteCommentResponse {
   isDeleted: boolean
-  user: CommentUser
 }
 
+export interface UpdateCommentRequest {
+  body: string
+}
+export interface AddCommentRequest {
+  body: string
+  postId: number
+  userId: number
+}
 export interface LikeCommentRequest {
   likes: number
 }
@@ -34,13 +48,13 @@ export const getCommentsByPostId = async (postId: number): Promise<CommentsRespo
 }
 
 // 댓글 추가
-export const addComment = async (comment: Comment): Promise<AddCommentResponse> => {
-  return api.post<AddCommentResponse, Comment>("/comments/add", comment)
+export const addComment = async (addedComment: AddCommentRequest): Promise<AddCommentResponse> => {
+  return api.post<AddCommentResponse, AddCommentRequest>("/comments/add", addedComment)
 }
 
 // 댓글 수정
-export const updateComment = async (commentId: number, comment: Comment): Promise<UpdateCommentResponse> => {
-  return api.put<UpdateCommentResponse, Comment>(`/comments/${commentId}`, comment)
+export const updateComment = async (commentId: number, commentBody: UpdateCommentRequest): Promise<Comment> => {
+  return api.put<Comment, UpdateCommentRequest>(`/comments/${commentId}`, commentBody)
 }
 
 // 댓글 삭제
@@ -49,6 +63,6 @@ export const deleteComment = async (id: number): Promise<DeleteCommentResponse> 
 }
 
 // 댓글 좋아요
-export const likeComment = async (id: number, likes: LikeCommentRequest): Promise<UpdateCommentResponse> => {
-  return api.patch<UpdateCommentResponse, LikeCommentRequest>(`/comments/${id}`, likes)
+export const likeComment = async (id: number, likes: LikeCommentRequest): Promise<Comment> => {
+  return api.patch<Comment, LikeCommentRequest>(`/comments/${id}`, likes)
 }
