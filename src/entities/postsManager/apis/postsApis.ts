@@ -29,13 +29,13 @@ export interface UserInfo {
   firstName: string
   email?: string
   phone?: string
-  company?: {
+  company: {
     address: Address
     department: string
     name: string
     title: string
   }
-  address?: Address
+  address: Address
   role: string
 }
 

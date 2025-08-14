@@ -14,25 +14,23 @@ import { Comment } from "../../postsManager/apis/postsApis"
 interface CommentsProps {
   postId: number
 }
-interface Comments {
-  [key: string]: Comment[] //postId에 대한 댓글 배열
-}
+
 interface NewComment {
   body: string
-  postId: string | null
+  postId: number | null
   userId: number
 }
 // 댓글 렌더링
 export const Comments = ({ postId }: CommentsProps) => {
   const { searchQuery } = useQueryParams()
-  const [comments, setComments] = useState<Comments>({})
+  const [comments, setComments] = useState<Record<number, Comment[]>>({})
   const [newComment, setNewComment] = useState<NewComment>({ body: "", postId: null, userId: 1 })
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null)
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false)
   const [showEditCommentDialog, setShowEditCommentDialog] = useState(false)
 
   // 댓글 가져오기
-  const fetchComments = async (postId: string) => {
+  const fetchComments = async (postId: number) => {
     if (comments[postId]) return // 이미 불러온 댓글이 있으면 다시 불러오지 않음
     try {
       const response = await fetch(`/api/comments/post/${postId}`)
@@ -83,7 +81,7 @@ export const Comments = ({ postId }: CommentsProps) => {
   }
 
   // 댓글 삭제
-  const deleteComment = async (id: string, postId: string) => {
+  const deleteComment = async (id: number, postId: number) => {
     try {
       await fetch(`/api/comments/${id}`, {
         method: "DELETE",
@@ -98,7 +96,7 @@ export const Comments = ({ postId }: CommentsProps) => {
   }
 
   // 댓글 좋아요
-  const likeComment = async (id: string, postId: string) => {
+  const likeComment = async (id: number, postId: number) => {
     const comment = comments[postId]?.find((c) => c.id === id)
     if (!comment) return
     try {
