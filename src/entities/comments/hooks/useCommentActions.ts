@@ -102,21 +102,24 @@ export const useCommentActions = (postId: number) => {
     },
   })
 
-  // Wrapper functions for backward compatibility
+  // 댓글 삭제
   const deleteCommentById = async (id: number) => {
     return deleteCommentMutation.mutateAsync(id)
   }
 
+  // 댓글 좋아요
   const likeCommentById = async (id: number) => {
     const comment = comments?.find((c) => c.id === id)
     if (!comment) return
     return likeCommentMutation.mutateAsync({ commentId: id, likes: comment.likes + 1 })
   }
 
+  // 댓글 수정
   const updateCommentById = async (commentId: number, body: string) => {
     return updateCommentMutation.mutateAsync({ commentId, body })
   }
 
+  // 댓글 추가
   const addCommentToPost = async (commentData: AddCommentRequest) => {
     return addCommentMutation.mutateAsync(commentData)
   }
