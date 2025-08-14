@@ -4,7 +4,7 @@ import { QUERY_KEYS } from "@/shared"
 
 export const useTagActions = () => {
   const { data: tags = [], isLoading } = useQuery({
-    queryKey: QUERY_KEYS.TAGS,
+    queryKey: QUERY_KEYS.TAGS.all,
     queryFn: getTags,
   })
 

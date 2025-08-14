@@ -12,7 +12,7 @@ export const useUserActions = () => {
     isLoading: isLoadingUser,
     error,
   } = useQuery({
-    queryKey: QUERY_KEYS.USERS(selectedUserId),
+    queryKey: QUERY_KEYS.USERS.byId(selectedUserId),
     queryFn: () => getUserById(selectedUserId!),
     enabled: !!selectedUserId,
   })
