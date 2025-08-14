@@ -44,7 +44,9 @@ export const UserDialog = ({ open, onOpenChange, selectedUser, isLoading }: User
               </div>
             </>
           )}
-          {!selectedUser && <div className="text-center text-sm text-gray-500">사용자 정보를 찾을 수 없습니다.</div>}
+          {!isLoading && !selectedUser && (
+            <div className="text-center text-sm text-gray-500">사용자 정보를 찾을 수 없습니다.</div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
