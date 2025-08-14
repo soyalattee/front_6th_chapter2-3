@@ -1,7 +1,7 @@
 import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, useQueryParams } from "@/shared"
 import { Search } from "lucide-react"
-import { getTags, Tag } from "./api/postsApis"
-import { useEffect, useState } from "react"
+import { useState } from "react"
+import { useTagActions } from "./hooks/useTagActions"
 
 interface SearchFilterContainerProps {
   searchPosts: () => void
@@ -11,19 +11,9 @@ interface SearchFilterContainerProps {
 export const SearchFilterContainer = ({ searchPosts, fetchPostsByTag }: SearchFilterContainerProps) => {
   const { searchQuery, sortBy, sortOrder, setSearchQuery, setSortBy, setSortOrder, selectedTag, setSelectedTag } =
     useQueryParams()
+  const { tags } = useTagActions()
 
-  const [tags, setTags] = useState<Tag[]>([])
   const [searchValue, setSearchValue] = useState(searchQuery)
-
-  // 태그 가져오기
-  const fetchTags = async () => {
-    try {
-      const tagsData = await getTags()
-      setTags(tagsData)
-    } catch (error) {
-      console.error("태그 가져오기 오류:", error)
-    }
-  }
 
   // 검색 핸들러
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -32,10 +22,6 @@ export const SearchFilterContainer = ({ searchPosts, fetchPostsByTag }: SearchFi
       searchPosts()
     }
   }
-
-  useEffect(() => {
-    fetchTags()
-  }, [])
 
   return (
     <div className="flex gap-4">
