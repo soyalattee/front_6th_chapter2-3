@@ -1,24 +1,9 @@
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  HighlightText,
-  Textarea,
-  useQueryParams,
-} from "@/shared"
+import { Button, HighlightText, useQueryParams } from "@/shared"
 import { Plus, ThumbsUp, Edit2, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
-import {
-  addComment,
-  AddCommentRequest,
-  Comment,
-  deleteComment,
-  getCommentsByPostId,
-  likeComment,
-  updateComment,
-} from "../api/commentsApis"
+import { Comment, deleteComment, getCommentsByPostId, likeComment, updateComment } from "../api/commentsApis"
+import { AddCommentDialog } from "./AddCommentDialog"
+import { EditCommentDialog } from "./EditCommentDialog"
 
 interface CommentsProps {
   postId: number
@@ -28,7 +13,6 @@ interface CommentsProps {
 export const Comments = ({ postId }: CommentsProps) => {
   const { searchQuery } = useQueryParams()
   const [comments, setComments] = useState<Record<number, Comment[]>>({})
-  const [newComment, setNewComment] = useState<AddCommentRequest | null>()
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null)
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false)
   const [showEditCommentDialog, setShowEditCommentDialog] = useState(false)
@@ -44,22 +28,6 @@ export const Comments = ({ postId }: CommentsProps) => {
     }
   }
 
-  // 댓글 추가
-  const handleAddComment = async () => {
-    if (!newComment) return
-    try {
-      const response = await addComment(newComment)
-
-      setComments((prev) => ({
-        ...prev,
-        [response.postId]: [...(prev[response.postId] || []), { ...response, likes: 0 }],
-      }))
-      setShowAddCommentDialog(false)
-      setNewComment(null)
-    } catch (error) {
-      console.error("댓글 추가 오류:", error)
-    }
-  }
   // 댓글 업데이트
   const handleUpdateComment = async () => {
     try {
@@ -122,7 +90,6 @@ export const Comments = ({ postId }: CommentsProps) => {
           <Button
             size="sm"
             onClick={() => {
-              setNewComment({ body: "", postId, userId: 1 })
               setShowAddCommentDialog(true)
             }}
           >
@@ -164,37 +131,22 @@ export const Comments = ({ postId }: CommentsProps) => {
       </div>
 
       {/* 댓글 추가 대화상자 */}
-      {newComment && (
-        <Dialog open={showAddCommentDialog} onOpenChange={setShowAddCommentDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>새 댓글 추가</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <Textarea
-                placeholder="댓글 내용"
-                value={newComment.body}
-                onChange={(e) => setNewComment({ ...newComment, body: e.target.value })}
-              />
-              <Button onClick={handleAddComment}>댓글 추가</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      <AddCommentDialog
+        showAddCommentDialog={showAddCommentDialog}
+        setShowAddCommentDialog={setShowAddCommentDialog}
+        setComments={setComments}
+        postId={postId}
+      />
 
       {/* 댓글 수정 대화상자 */}
       {selectedComment && (
-        <Dialog open={showEditCommentDialog} onOpenChange={setShowEditCommentDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>댓글 수정</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <Textarea placeholder="댓글 내용" value={selectedComment?.body || ""} onChange={handleCommentChange} />
-              <Button onClick={handleUpdateComment}>댓글 업데이트</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <EditCommentDialog
+          showEditCommentDialog={showEditCommentDialog}
+          setShowEditCommentDialog={setShowEditCommentDialog}
+          selectedComment={selectedComment}
+          handleCommentChange={handleCommentChange}
+          handleUpdateComment={handleUpdateComment}
+        />
       )}
     </>
   )
