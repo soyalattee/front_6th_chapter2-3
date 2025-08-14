@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react"
+import { useState, useCallback } from "react"
 import { Plus } from "lucide-react"
 import { Button, Card, CardContent, CardHeader, CardTitle, useQueryParams } from "@/shared"
 import { PostsTable } from "../posts/ui/PostsTable"
@@ -12,7 +12,7 @@ import { usePostActions, PostWithAuthor } from "./hooks/usePostActions"
 import { useUserActions } from "../users/hooks/useUserActions"
 
 export const PostsManagerComponent = () => {
-  const { skip, limit, searchQuery, sortBy, sortOrder, selectedTag } = useQueryParams()
+  const { skip, limit, searchQuery, selectedTag, sortBy, order } = useQueryParams()
 
   const {
     posts,
@@ -26,7 +26,9 @@ export const PostsManagerComponent = () => {
     addPostToList,
     updatePostInList,
     deletePostFromList,
-  } = usePostActions()
+    isAddingPost,
+    isUpdatingPost,
+  } = usePostActions({ limit, skip, searchQuery, tag: selectedTag, sortBy, order })
 
   const { selectedUser, isLoadingUser, selectUser, clearSelectedUser } = useUserActions()
 
@@ -35,10 +37,6 @@ export const PostsManagerComponent = () => {
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [showPostDetailDialog, setShowPostDetailDialog] = useState(false)
   const [showUserModal, setShowUserModal] = useState(false)
-
-  // 로딩 상태 관리
-  const [isAdding, setIsAdding] = useState(false)
-  const [isUpdating, setIsUpdating] = useState(false)
 
   // 폼 데이터 상태
   const [newPostData, setNewPostData] = useState<CreatePostData>({ title: "", body: "", userId: 1 })
@@ -51,13 +49,12 @@ export const PostsManagerComponent = () => {
       return
     }
 
-    setIsAdding(true)
     try {
       await addPostToList(newPostData)
       setShowAddDialog(false)
       setNewPostData({ title: "", body: "", userId: 1 })
-    } finally {
-      setIsAdding(false)
+    } catch (error) {
+      console.error("게시물 추가 실패:", error)
     }
   }
 
@@ -65,7 +62,6 @@ export const PostsManagerComponent = () => {
   const handleUpdatePost = async () => {
     if (!editPostData) return
 
-    setIsUpdating(true)
     try {
       await updatePostInList({
         id: editPostData.id,
@@ -77,8 +73,8 @@ export const PostsManagerComponent = () => {
         views: editPostData.views,
       })
       setShowEditDialog(false)
-    } finally {
-      setIsUpdating(false)
+    } catch (error) {
+      console.error("게시물 수정 실패:", error)
     }
   }
 
@@ -130,14 +126,6 @@ export const PostsManagerComponent = () => {
     setShowUserModal(true)
   }
 
-  useEffect(() => {
-    if (selectedTag) {
-      handleFetchPostsByTag(selectedTag)
-    } else {
-      fetchPosts({ limit, skip })
-    }
-  }, [skip, limit, sortBy, sortOrder, selectedTag, handleFetchPostsByTag, fetchPosts])
-
   return (
     <Card className="w-full max-w-6xl mx-auto">
       <CardHeader>
@@ -178,7 +166,7 @@ export const PostsManagerComponent = () => {
         postData={newPostData}
         onPostDataChange={setNewPostData}
         onAddPost={handleAddPost}
-        isLoading={isAdding}
+        isLoading={isAddingPost}
       />
 
       {/* 게시물 수정 대화상자 */}
@@ -188,7 +176,7 @@ export const PostsManagerComponent = () => {
         post={editPostData}
         onPostChange={setEditPostData}
         onUpdatePost={handleUpdatePost}
-        isLoading={isUpdating}
+        isLoading={isUpdatingPost}
       />
 
       {/* 게시물 상세 보기 대화상자 */}

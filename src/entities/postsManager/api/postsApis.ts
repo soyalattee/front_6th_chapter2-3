@@ -26,18 +26,29 @@ export type TagsResponse = Tag[]
 // API 함수
 
 // 게시물 가져오기
-export const getPosts = async (params: { limit: number; skip: number }): Promise<PostsResponse> => {
+export const getPosts = async (params: {
+  limit: number
+  skip: number
+  sortBy?: string
+  order?: string
+}): Promise<PostsResponse> => {
   return api.get<PostsResponse>(`/posts`, { params })
 }
 
 // 검색으로 게시물 가져오기
-export const getPostsBySearch = async (q: string): Promise<PostsResponse> => {
-  return api.get<PostsResponse>(`/posts/search`, { params: { q } })
+export const getPostsBySearch = async (
+  q: string,
+  params: { limit: number; skip: number; sortBy?: string; order?: string },
+): Promise<PostsResponse> => {
+  return api.get<PostsResponse>(`/posts/search`, { params: { q, ...params } })
 }
 
 // 태그별 게시물 가져오기
-export const getPostsByTag = async (tag: string): Promise<PostsResponse> => {
-  return api.get<PostsResponse>(`/posts/tag/${tag}`)
+export const getPostsByTag = async (
+  tag: string,
+  params: { limit: number; skip: number; sortBy?: string; order?: string },
+): Promise<PostsResponse> => {
+  return api.get<PostsResponse>(`/posts/tag/${tag}`, { params })
 }
 
 // 태그 가져오기

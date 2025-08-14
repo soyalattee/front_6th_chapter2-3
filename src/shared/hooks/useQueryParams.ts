@@ -11,8 +11,8 @@ export interface QueryParamsState {
   setSearchQuery: (value: string | null) => void
   sortBy: string
   setSortBy: (value: string | null) => void
-  sortOrder: string
-  setSortOrder: (value: string | null) => void
+  order: string
+  setOrder: (value: string | null) => void
   selectedTag: string
   setSelectedTag: (value: string | null) => void
 }
@@ -24,8 +24,8 @@ export const useQueryParams = (): QueryParamsState => {
       skip: parseAsInteger.withDefault(0),
       limit: parseAsInteger.withDefault(10),
       search: parseAsString.withDefault(""),
-      sortBy: parseAsString.withDefault(""),
-      sortOrder: parseAsString.withDefault("asc"),
+      sortBy: parseAsString.withDefault("id"),
+      order: parseAsString.withDefault("asc"),
       tag: parseAsString.withDefault(""),
     },
     {
@@ -34,7 +34,7 @@ export const useQueryParams = (): QueryParamsState => {
     },
   )
 
-  const { skip, limit, search: searchQuery, sortBy, sortOrder, tag: selectedTag } = queryParams
+  const { skip, limit, search: searchQuery, sortBy, order, tag: selectedTag } = queryParams
 
   // 개별 setter 함수들
   const setSkip = useCallback(
@@ -65,9 +65,9 @@ export const useQueryParams = (): QueryParamsState => {
     [setQueryParams],
   )
 
-  const setSortOrder = useCallback(
+  const setOrder = useCallback(
     (value: string | null) => {
-      setQueryParams({ sortOrder: value })
+      setQueryParams({ order: value })
     },
     [setQueryParams],
   )
@@ -88,8 +88,8 @@ export const useQueryParams = (): QueryParamsState => {
     setSearchQuery,
     sortBy,
     setSortBy,
-    sortOrder,
-    setSortOrder,
+    order,
+    setOrder,
     selectedTag,
     setSelectedTag,
   }

@@ -9,7 +9,7 @@ interface SearchFilterContainerProps {
 }
 
 export const SearchFilterContainer = ({ searchPosts, fetchPostsByTag }: SearchFilterContainerProps) => {
-  const { searchQuery, sortBy, sortOrder, setSearchQuery, setSortBy, setSortOrder, selectedTag, setSelectedTag } =
+  const { searchQuery, sortBy, order, setSearchQuery, setSortBy, setOrder, selectedTag, setSelectedTag } =
     useQueryParams()
   const { tags, isLoading: isTagsLoading } = useTagActions()
 
@@ -69,7 +69,7 @@ export const SearchFilterContainer = ({ searchPosts, fetchPostsByTag }: SearchFi
           <SelectItem value="reactions">반응</SelectItem>
         </SelectContent>
       </Select>
-      <Select value={sortOrder} onValueChange={setSortOrder}>
+      <Select value={order} onValueChange={setOrder}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="정렬 순서" />
         </SelectTrigger>
