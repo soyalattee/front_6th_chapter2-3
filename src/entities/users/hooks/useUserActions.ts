@@ -1,23 +1,45 @@
-import { useState, useCallback } from "react"
-import { UserInfo, getUserById } from "@/entities/users/api/userApis"
+import { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { getUserById } from "@/entities/users/api/userApis"
+import { QUERY_KEYS } from "@/shared"
+
+export const userQueryKeys = {
+  all: QUERY_KEYS.USERS,
+  byId: (userId: number) => [...QUERY_KEYS.USERS, "byId", userId] as const,
+} as const
 
 export const useUserActions = () => {
-  const [selectedUser, setSelectedUser] = useState<UserInfo | null>(null)
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
 
-  // 사용자 정보 가져오기
-  const fetchUserById = useCallback(async (userId: number) => {
-    try {
-      const userData = await getUserById(userId)
-      setSelectedUser(userData)
-      return userData
-    } catch (error) {
-      console.error("사용자 정보 가져오기 오류:", error)
-      throw error
-    }
-  }, [])
+  // 선택된 사용자 정보 가져오기
+  const {
+    data: selectedUser = null,
+    isLoading: isLoadingUser,
+    error,
+    refetch: refetchUser,
+  } = useQuery({
+    queryKey: userQueryKeys.byId(selectedUserId!),
+    queryFn: () => getUserById(selectedUserId!),
+    enabled: !!selectedUserId,
+  })
+
+  // 사용자 선택
+  const selectUser = (userId: number) => {
+    setSelectedUserId(userId)
+  }
+
+  // 사용자 선택 해제
+  const clearSelectedUser = () => {
+    setSelectedUserId(null)
+  }
 
   return {
     selectedUser,
-    fetchUserById,
+    selectedUserId,
+    isLoadingUser,
+    error,
+    selectUser,
+    clearSelectedUser,
+    refetchUser,
   }
 }

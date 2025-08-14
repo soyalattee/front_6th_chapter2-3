@@ -28,7 +28,7 @@ export const PostsManagerComponent = () => {
     deletePostFromList,
   } = usePostActions()
 
-  const { selectedUser, fetchUserById } = useUserActions()
+  const { selectedUser, isLoadingUser, selectUser, clearSelectedUser } = useUserActions()
 
   // Dialog 상태 관리
   const [showAddDialog, setShowAddDialog] = useState(false)
@@ -125,13 +125,9 @@ export const PostsManagerComponent = () => {
   }
 
   // 사용자 모달 열기
-  const openUserModal = async (userId: number) => {
-    try {
-      await fetchUserById(userId)
-      setShowUserModal(true)
-    } catch (error) {
-      console.error("사용자 정보 가져오기 오류:", error)
-    }
+  const openUserModal = (userId: number) => {
+    selectUser(userId)
+    setShowUserModal(true)
   }
 
   useEffect(() => {
@@ -205,9 +201,17 @@ export const PostsManagerComponent = () => {
       )}
 
       {/* 사용자 모달 */}
-      {selectedUser && (
-        <UserDialog showUserModal={showUserModal} setShowUserModal={setShowUserModal} selectedUser={selectedUser} />
-      )}
+      <UserDialog
+        open={showUserModal}
+        onOpenChange={(open) => {
+          setShowUserModal(open)
+          if (!open) {
+            clearSelectedUser()
+          }
+        }}
+        selectedUser={selectedUser}
+        isLoading={isLoadingUser}
+      />
     </Card>
   )
 }
