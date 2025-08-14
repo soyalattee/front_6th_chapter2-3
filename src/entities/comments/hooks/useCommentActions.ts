@@ -40,8 +40,6 @@ export const useCommentActions = (postId: number) => {
       return response.comments
     },
     enabled: !!postId && !hasComments, // 댓글이 없을 때만 실행
-    staleTime: 1000 * 60 * 2, // 2분간 fresh
-    gcTime: 1000 * 60 * 10, // 10분간 캐시 유지
   })
 
   const loading = storeLoading || fetchLoading
