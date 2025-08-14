@@ -1,10 +1,11 @@
-import { Button, HighlightText, useQueryParams } from "@/shared"
-import { Plus, ThumbsUp, Edit2, Trash2 } from "lucide-react"
+import { Button } from "@/shared"
+import { Plus } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Comment } from "../api/commentsApis"
 import { useCommentActions } from "../hooks/useCommentActions"
 import { AddCommentDialog } from "./AddCommentDialog"
 import { EditCommentDialog } from "./EditCommentDialog"
+import { CommentItem } from "./CommentItem"
 
 interface CommentsProps {
   postId: number
@@ -12,7 +13,6 @@ interface CommentsProps {
 
 // 댓글 렌더링
 export const Comments = ({ postId }: CommentsProps) => {
-  const { searchQuery } = useQueryParams()
   const {
     comments,
     selectedComment,
@@ -91,26 +91,14 @@ export const Comments = ({ postId }: CommentsProps) => {
         </div>
         <div className="space-y-1">
           {comments[postId]?.map((comment) => (
-            <div key={comment.id} className="flex items-center justify-between text-sm border-b pb-1">
-              <div className="flex items-center space-x-2 overflow-hidden">
-                <span className="font-medium truncate">{comment.user.username}:</span>
-                <span className="truncate">
-                  <HighlightText text={comment.body} highlight={searchQuery} />
-                </span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <Button variant="ghost" size="sm" onClick={() => likeCommentById(comment.id, postId)}>
-                  <ThumbsUp className="w-3 h-3" />
-                  <span className="ml-1 text-xs">{comment.likes}</span>
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => openEditCommentDialog(comment)}>
-                  <Edit2 className="w-3 h-3" />
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => deleteCommentById(comment.id, postId)}>
-                  <Trash2 className="w-3 h-3" />
-                </Button>
-              </div>
-            </div>
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              postId={postId}
+              likeCommentById={likeCommentById}
+              openEditCommentDialog={openEditCommentDialog}
+              deleteCommentById={deleteCommentById}
+            />
           ))}
         </div>
       </div>
