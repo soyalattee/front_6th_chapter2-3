@@ -1,6 +1,6 @@
 import { Button } from "@/shared"
 import { Plus } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Comment } from "../api/commentsApis"
 import { useCommentActions } from "../hooks/useCommentActions"
 import { AddCommentDialog } from "./AddCommentDialog"
@@ -17,18 +17,18 @@ export const Comments = ({ postId }: CommentsProps) => {
     comments,
     selectedComment,
     setSelectedComment,
-    fetchComments,
+    loading,
     deleteCommentById,
     likeCommentById,
     updateCommentById,
     addCommentToPost,
     updateSelectedComment,
-  } = useCommentActions()
+    isAddingComment,
+    isUpdatingComment,
+  } = useCommentActions(postId) // postId를 인자로 전달
 
   const [showAddCommentDialog, setShowAddCommentDialog] = useState(false)
   const [showEditCommentDialog, setShowEditCommentDialog] = useState(false)
-  const [isUpdating, setIsUpdating] = useState(false)
-  const [isAdding, setIsAdding] = useState(false)
   const [newCommentBody, setNewCommentBody] = useState("")
 
   // 댓글 내용 변경 핸들러
@@ -40,12 +40,11 @@ export const Comments = ({ postId }: CommentsProps) => {
   // 댓글 업데이트 핸들러
   const handleUpdateComment = async () => {
     if (!selectedComment) return
-    setIsUpdating(true)
     try {
       await updateCommentById(selectedComment.id, selectedComment.body)
       setShowEditCommentDialog(false)
-    } finally {
-      setIsUpdating(false)
+    } catch (error) {
+      console.error("댓글 업데이트 실패:", error)
     }
   }
 
@@ -56,13 +55,29 @@ export const Comments = ({ postId }: CommentsProps) => {
       return
     }
 
-    setIsAdding(true)
     try {
       await addCommentToPost({ body: newCommentBody, postId, userId: 1 })
       setShowAddCommentDialog(false)
       setNewCommentBody("")
-    } finally {
-      setIsAdding(false)
+    } catch (error) {
+      console.error("댓글 추가 실패:", error)
+    }
+  }
+
+  // wrapper functions for CommentItem compatibility
+  const handleLikeComment = async (id: number) => {
+    try {
+      await likeCommentById(id)
+    } catch (error) {
+      console.error("댓글 좋아요 실패:", error)
+    }
+  }
+
+  const handleDeleteComment = async (id: number) => {
+    try {
+      await deleteCommentById(id)
+    } catch (error) {
+      console.error("댓글 삭제 실패:", error)
     }
   }
 
@@ -75,10 +90,6 @@ export const Comments = ({ postId }: CommentsProps) => {
     setShowEditCommentDialog(true)
   }
 
-  useEffect(() => {
-    fetchComments(postId)
-  }, [postId, fetchComments])
-
   return (
     <>
       <div className="mt-2">
@@ -90,16 +101,18 @@ export const Comments = ({ postId }: CommentsProps) => {
           </Button>
         </div>
         <div className="space-y-1">
-          {comments[postId]?.map((comment) => (
-            <CommentItem
-              key={comment.id}
-              comment={comment}
-              postId={postId}
-              likeCommentById={likeCommentById}
-              openEditCommentDialog={openEditCommentDialog}
-              deleteCommentById={deleteCommentById}
-            />
-          ))}
+          {loading && <div className="text-center text-sm text-gray-500">댓글을 불러오는 중...</div>}
+          {comments &&
+            comments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                postId={postId}
+                likeCommentById={handleLikeComment}
+                openEditCommentDialog={openEditCommentDialog}
+                deleteCommentById={handleDeleteComment}
+              />
+            ))}
         </div>
       </div>
 
@@ -110,7 +123,7 @@ export const Comments = ({ postId }: CommentsProps) => {
         commentBody={newCommentBody}
         onCommentBodyChange={setNewCommentBody}
         onAddComment={handleAddComment}
-        isLoading={isAdding}
+        isLoading={isAddingComment}
       />
 
       {/* 댓글 수정 대화상자 */}
@@ -120,7 +133,7 @@ export const Comments = ({ postId }: CommentsProps) => {
         comment={selectedComment}
         onCommentChange={handleCommentChange}
         onUpdateComment={handleUpdateComment}
-        isLoading={isUpdating}
+        isLoading={isUpdatingComment}
       />
     </>
   )

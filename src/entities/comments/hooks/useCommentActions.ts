@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react"
+import { useState } from "react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   Comment,
   deleteComment,
@@ -8,83 +9,116 @@ import {
   addComment,
   AddCommentRequest,
 } from "../api/commentsApis"
+import { QUERY_KEYS } from "@/shared"
 
-export const useCommentActions = () => {
-  const [comments, setComments] = useState<Record<number, Comment[]>>({})
+export const useCommentActions = (postId: number) => {
+  const queryClient = useQueryClient()
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null)
 
-  // 댓글 가져오기
-  const fetchComments = useCallback(
-    async (postId: number) => {
-      if (comments[postId]) return // 이미 불러온 댓글이 있으면 다시 불러오지 않음
-      try {
-        const response = await getCommentsByPostId(postId)
-        setComments((prev) => ({ ...prev, [postId]: response.comments }))
-      } catch (error) {
-        console.error("댓글 가져오기 오류:", error)
+  // 전역 댓글 저장소 가져오기
+  const { data: commentsStore = {}, isLoading: storeLoading } = useQuery({
+    queryKey: QUERY_KEYS.COMMENTS.store,
+    queryFn: () => Promise.resolve({} as Record<number, Comment[]>), // 초기값
+    staleTime: Infinity, // 영구 저장
+    gcTime: Infinity, // 메모리에서 제거하지 않음
+  })
+
+  // 현재 게시물의 댓글들
+  const comments = commentsStore[postId] || []
+  const hasComments = !!commentsStore[postId]
+
+  // 댓글이 없을 때만 서버에서 가져오기
+  const { isLoading: fetchLoading, error } = useQuery({
+    queryKey: QUERY_KEYS.COMMENTS.byPost(postId),
+    queryFn: async () => {
+      const response = await getCommentsByPostId(postId)
+      // 가져온 댓글을 전역 저장소에 저장
+      queryClient.setQueryData<Record<number, Comment[]>>(QUERY_KEYS.COMMENTS.store, (prevStore) => ({
+        ...prevStore,
+        [postId]: response.comments,
+      }))
+      return response.comments
+    },
+    enabled: !!postId && !hasComments, // 댓글이 없을 때만 실행
+    staleTime: 1000 * 60 * 2, // 2분간 fresh
+    gcTime: 1000 * 60 * 10, // 10분간 캐시 유지
+  })
+
+  const loading = storeLoading || fetchLoading
+
+  // 댓글 삭제 Mutation
+  const deleteCommentMutation = useMutation({
+    mutationFn: (commentId: number) => deleteComment(commentId),
+    onSuccess: (_, commentId) => {
+      // 전역 저장소에서 댓글 삭제
+      queryClient.setQueryData<Record<number, Comment[]>>(QUERY_KEYS.COMMENTS.store, (prevStore) => ({
+        ...prevStore,
+        [postId]: prevStore?.[postId]?.filter((comment) => comment.id !== commentId) || [],
+      }))
+    },
+  })
+
+  // 댓글 좋아요 Mutation
+  const likeCommentMutation = useMutation({
+    mutationFn: ({ commentId, likes }: { commentId: number; likes: number }) => likeComment(commentId, { likes }),
+    onSuccess: (updatedComment) => {
+      // 전역 저장소에서 댓글 좋아요 업데이트
+      queryClient.setQueryData<Record<number, Comment[]>>(QUERY_KEYS.COMMENTS.store, (prevStore) => ({
+        ...prevStore,
+        [postId]:
+          prevStore?.[postId]?.map((comment) =>
+            comment.id === updatedComment.id ? { ...updatedComment, likes: updatedComment.likes + 1 } : comment,
+          ) || [],
+      }))
+    },
+  })
+
+  // 댓글 수정 Mutation
+  const updateCommentMutation = useMutation({
+    mutationFn: ({ commentId, body }: { commentId: number; body: string }) => updateComment(commentId, { body }),
+    onSuccess: (updatedComment) => {
+      // 전역 저장소에서 댓글 수정
+      queryClient.setQueryData<Record<number, Comment[]>>(QUERY_KEYS.COMMENTS.store, (prevStore) => ({
+        ...prevStore,
+        [postId]:
+          prevStore?.[postId]?.map((comment) => (comment.id === updatedComment.id ? updatedComment : comment)) || [],
+      }))
+      // 선택된 댓글도 업데이트
+      if (selectedComment?.id === updatedComment.id) {
+        setSelectedComment(updatedComment)
       }
     },
-    [comments],
-  )
+  })
 
-  // 댓글 삭제
-  const deleteCommentById = async (id: number, postId: number) => {
-    try {
-      await deleteComment(id)
-      setComments((prev) => ({
-        ...prev,
-        [postId]: prev[postId].filter((comment) => comment.id !== id),
+  // 댓글 추가 Mutation
+  const addCommentMutation = useMutation({
+    mutationFn: addComment,
+    onSuccess: (newComment) => {
+      // 전역 저장소에 댓글 추가
+      queryClient.setQueryData<Record<number, Comment[]>>(QUERY_KEYS.COMMENTS.store, (prevStore) => ({
+        ...prevStore,
+        [postId]: [...(prevStore?.[postId] || []), { ...newComment, likes: 0 }],
       }))
-    } catch (error) {
-      console.error("댓글 삭제 오류:", error)
-    }
+    },
+  })
+
+  // Wrapper functions for backward compatibility
+  const deleteCommentById = async (id: number) => {
+    return deleteCommentMutation.mutateAsync(id)
   }
 
-  // 댓글 좋아요
-  const likeCommentById = async (id: number, postId: number) => {
-    const comment = comments[postId]?.find((c) => c.id === id)
+  const likeCommentById = async (id: number) => {
+    const comment = comments?.find((c) => c.id === id)
     if (!comment) return
-    try {
-      const response = await likeComment(id, { likes: comment.likes + 1 })
-      setComments((prev) => ({
-        ...prev,
-        [postId]: prev[postId].map((comment) =>
-          comment.id === response.id ? { ...response, likes: comment.likes + 1 } : comment,
-        ),
-      }))
-    } catch (error) {
-      console.error("댓글 좋아요 오류:", error)
-    }
+    return likeCommentMutation.mutateAsync({ commentId: id, likes: comment.likes + 1 })
   }
 
-  // 댓글 수정
   const updateCommentById = async (commentId: number, body: string) => {
-    try {
-      const response = await updateComment(commentId, { body })
-      setComments((prev) => ({
-        ...prev,
-        [response.postId]: prev[response.postId].map((comment) => (comment.id === response.id ? response : comment)),
-      }))
-      return response
-    } catch (error) {
-      console.error("댓글 업데이트 오류:", error)
-      throw error
-    }
+    return updateCommentMutation.mutateAsync({ commentId, body })
   }
 
-  // 댓글 추가
   const addCommentToPost = async (commentData: AddCommentRequest) => {
-    try {
-      const response = await addComment(commentData)
-      setComments((prev) => ({
-        ...prev,
-        [response.postId]: [...(prev[response.postId] || []), { ...response, likes: 0 }],
-      }))
-      return response
-    } catch (error) {
-      console.error("댓글 추가 오류:", error)
-      throw error
-    }
+    return addCommentMutation.mutateAsync(commentData)
   }
 
   // 선택된 댓글 업데이트 (로컬 상태만)
@@ -92,15 +126,31 @@ export const useCommentActions = () => {
     setSelectedComment(updatedComment)
   }
 
+  // 댓글 새로고침
+  const fetchComments = async () => {
+    const response = await getCommentsByPostId(postId)
+    queryClient.setQueryData<Record<number, Comment[]>>(QUERY_KEYS.COMMENTS.store, (prevStore) => ({
+      ...prevStore,
+      [postId]: response.comments,
+    }))
+  }
+
   return {
     comments,
     selectedComment,
     setSelectedComment,
+    loading,
+    error,
     fetchComments,
     deleteCommentById,
     likeCommentById,
     updateCommentById,
     addCommentToPost,
     updateSelectedComment,
+    // Mutation loading states
+    isAddingComment: addCommentMutation.isPending,
+    isUpdatingComment: updateCommentMutation.isPending,
+    isDeletingComment: deleteCommentMutation.isPending,
+    isLikingComment: likeCommentMutation.isPending,
   }
 }
