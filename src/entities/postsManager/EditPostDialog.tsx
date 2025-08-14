@@ -39,6 +39,7 @@ export const EditPostDialog = ({
       console.error("게시물 업데이트 오류:", error)
     }
   }
+
   return (
     <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
       <DialogContent>
