@@ -1,17 +1,10 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom"
-import { NuqsAdapter } from "nuqs/adapters/react-router"
-import { PostsManagerPage } from "@/pages"
+import { RouterProvider } from "./RouterProvider"
+import { Routes } from "./Routes"
 
-const AppRouter = () => {
+export const AppRouter = () => {
   return (
-    <BrowserRouter>
-      <NuqsAdapter>
-        <Routes>
-          <Route path="/" element={<PostsManagerPage />} />
-        </Routes>
-      </NuqsAdapter>
-    </BrowserRouter>
+    <RouterProvider>
+      <Routes />
+    </RouterProvider>
   )
 }
-
-export default AppRouter
