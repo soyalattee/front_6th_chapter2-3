@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react"
-import { getTags, Tag } from "../api/postsApis"
+import { useQuery } from "@tanstack/react-query"
+import { getTags } from "../api/postsApis"
+import { QUERY_KEYS } from "@/shared"
 
 export const useTagActions = () => {
-  const [tags, setTags] = useState<Tag[]>([])
+  const { data: tags = [], isLoading } = useQuery({
+    queryKey: QUERY_KEYS.TAGS,
+    queryFn: getTags,
+    staleTime: 1000 * 60 * 10, // 10분간 fresh (태그는 자주 변경되지 않음)
+  })
 
-  const fetchTags = async () => {
-    const tagsData = await getTags()
-    setTags(tagsData)
+  return {
+    tags,
+    isLoading,
   }
-  useEffect(() => {
-    fetchTags()
-  }, [])
-  return { tags, fetchTags }
 }

@@ -11,7 +11,7 @@ interface SearchFilterContainerProps {
 export const SearchFilterContainer = ({ searchPosts, fetchPostsByTag }: SearchFilterContainerProps) => {
   const { searchQuery, sortBy, sortOrder, setSearchQuery, setSortBy, setSortOrder, selectedTag, setSelectedTag } =
     useQueryParams()
-  const { tags } = useTagActions()
+  const { tags, isLoading: isTagsLoading } = useTagActions()
 
   const [searchValue, setSearchValue] = useState(searchQuery)
 
@@ -49,11 +49,13 @@ export const SearchFilterContainer = ({ searchPosts, fetchPostsByTag }: SearchFi
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">모든 태그</SelectItem>
-          {tags.map((tag) => (
-            <SelectItem key={tag.url} value={tag.slug}>
-              {tag.slug}
-            </SelectItem>
-          ))}
+          {tags &&
+            tags.map((tag) => (
+              <SelectItem key={tag.url} value={tag.slug}>
+                {tag.slug}
+              </SelectItem>
+            ))}
+          {isTagsLoading && <SelectItem value="loading">로딩중...</SelectItem>}
         </SelectContent>
       </Select>
       <Select value={sortBy} onValueChange={setSortBy}>
