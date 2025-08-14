@@ -64,7 +64,7 @@ export const Comments = ({ postId }: CommentsProps) => {
     }
   }
 
-  // wrapper functions for CommentItem compatibility
+  // 댓글 좋아요
   const handleLikeComment = async (id: number) => {
     try {
       await likeCommentById(id)
@@ -73,6 +73,7 @@ export const Comments = ({ postId }: CommentsProps) => {
     }
   }
 
+  // 댓글 삭제
   const handleDeleteComment = async (id: number) => {
     try {
       await deleteCommentById(id)
@@ -81,10 +82,12 @@ export const Comments = ({ postId }: CommentsProps) => {
     }
   }
 
+  // 댓글 추가 모달 열기
   const openAddCommentDialog = () => {
     setShowAddCommentDialog(true)
   }
 
+  // 댓글 수정 모달 열기
   const openEditCommentDialog = (comment: Comment) => {
     setSelectedComment(comment)
     setShowEditCommentDialog(true)
@@ -116,7 +119,7 @@ export const Comments = ({ postId }: CommentsProps) => {
         </div>
       </div>
 
-      {/* 댓글 추가 대화상자 */}
+      {/* 댓글 추가 모달 */}
       <AddCommentDialog
         open={showAddCommentDialog}
         onOpenChange={setShowAddCommentDialog}
@@ -126,7 +129,7 @@ export const Comments = ({ postId }: CommentsProps) => {
         isLoading={isAddingComment}
       />
 
-      {/* 댓글 수정 대화상자 */}
+      {/* 댓글 수정 모달 */}
       <EditCommentDialog
         open={showEditCommentDialog}
         onOpenChange={setShowEditCommentDialog}
