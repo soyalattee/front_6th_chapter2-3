@@ -3,14 +3,12 @@ import { Plus } from "lucide-react"
 import { Button, Card, CardContent, CardHeader, CardTitle, useQueryParams } from "@/shared"
 import { PostsTable } from "../posts/ui/PostsTable"
 import {
-  getCommentsByPostId,
   getPosts,
   getPostsBySearch,
   getPostsByTag,
   getUsers,
   Post,
   User,
-  Comment,
   getUserById,
   UserInfo,
 } from "./apis/postsApis"
@@ -29,17 +27,16 @@ export const PostsManagerComponent = () => {
 
   // 상태 관리
   const [posts, setPosts] = useState<PostWithAuthor[]>([])
-  const [total, setTotal] = useState(0)
 
   const [selectedPost, setSelectedPost] = useState<PostWithAuthor>()
+  const [selectedUser, setSelectedUser] = useState<UserInfo>()
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
-  const [loading, setLoading] = useState(false)
-
-  const [comments, setComments] = useState<Record<number, Comment[]>>({})
   const [showPostDetailDialog, setShowPostDetailDialog] = useState(false)
   const [showUserModal, setShowUserModal] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<UserInfo>()
+
+  const [loading, setLoading] = useState(false)
+  const [total, setTotal] = useState(0)
 
   // 게시물 가져오기
   const fetchPosts = async () => {
@@ -105,34 +102,22 @@ export const PostsManagerComponent = () => {
     setLoading(false)
   }
 
-  // 댓글 가져오기
-  const fetchComments = async (postId: number) => {
-    if (comments[postId]) return // 이미 불러온 댓글이 있으면 다시 불러오지 않음
-    try {
-      const commentsData = await getCommentsByPostId(postId)
-      setComments((prev) => ({ ...prev, [postId]: commentsData.comments }))
-    } catch (error) {
-      console.error("댓글 가져오기 오류:", error)
-    }
-  }
-
   // 게시물 수정 모달 열기
   const openEditDialog = (post: PostWithAuthor) => {
     setSelectedPost(post)
     setShowEditDialog(true)
   }
 
-  // 게시물 상세 보기
+  // 게시물 상세모달 열기
   const openPostDetail = (post: PostWithAuthor) => {
     setSelectedPost(post)
-    fetchComments(post.id)
     setShowPostDetailDialog(true)
   }
 
   // 사용자 모달 열기
-  const openUserModal = async (user: User) => {
+  const openUserModal = async (userId: number) => {
     try {
-      const userData = await getUserById(user.id)
+      const userData = await getUserById(userId)
       setSelectedUser(userData)
       setShowUserModal(true)
     } catch (error) {
