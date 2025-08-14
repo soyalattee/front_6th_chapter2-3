@@ -1,47 +1,38 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "@/shared"
-import { PostWithAuthor } from "./PostsManagerPage"
-import { Post, updatePost } from "./apis/postsApis"
+
+export interface PostEditData {
+  id: number
+  title: string
+  body: string
+  userId: number
+  tags: string[]
+  reactions: { likes: number; dislikes: number }
+  views: number
+}
 
 interface EditPostDialogProps {
-  showEditDialog: boolean
-  setShowEditDialog: (show: boolean) => void
-  selectedPost: PostWithAuthor
-  setSelectedPost: (post: PostWithAuthor) => void
-  posts: PostWithAuthor[]
-  setPosts: (posts: PostWithAuthor[]) => void
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  post: PostEditData | null
+  onPostChange: (post: PostEditData) => void
+  onUpdatePost: () => void
+  isLoading?: boolean
 }
-export const EditPostDialog = ({
-  showEditDialog,
-  setShowEditDialog,
-  selectedPost,
-  setSelectedPost,
-  posts,
-  setPosts,
-}: EditPostDialogProps) => {
-  // 게시물 업데이트
-  const handleUpdatePost = async () => {
-    if (!selectedPost) return
 
-    try {
-      const editedPost: Post = {
-        id: selectedPost.id,
-        title: selectedPost.title,
-        body: selectedPost.body,
-        userId: selectedPost.userId,
-        tags: selectedPost.tags,
-        reactions: selectedPost.reactions,
-        views: selectedPost.views,
-      }
-      const updatedPost = await updatePost(editedPost)
-      setPosts(posts.map((post) => (post.id === updatedPost.id ? updatedPost : post)))
-      setShowEditDialog(false)
-    } catch (error) {
-      console.error("게시물 업데이트 오류:", error)
-    }
-  }
+export const EditPostDialog = ({
+  open,
+  onOpenChange,
+  post,
+  onPostChange,
+  onUpdatePost,
+  isLoading = false,
+}: EditPostDialogProps) => {
+  if (!post) return null
+
+  const isValid = post.title.trim() !== "" && post.body.trim() !== ""
 
   return (
-    <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>게시물 수정</DialogTitle>
@@ -49,16 +40,20 @@ export const EditPostDialog = ({
         <div className="space-y-4">
           <Input
             placeholder="제목"
-            value={selectedPost?.title || ""}
-            onChange={(e) => setSelectedPost({ ...selectedPost, title: e.target.value } as PostWithAuthor)}
+            value={post.title}
+            onChange={(e) => onPostChange({ ...post, title: e.target.value })}
+            disabled={isLoading}
           />
           <Textarea
             rows={15}
             placeholder="내용"
-            value={selectedPost?.body || ""}
-            onChange={(e) => setSelectedPost({ ...selectedPost, body: e.target.value } as PostWithAuthor)}
+            value={post.body}
+            onChange={(e) => onPostChange({ ...post, body: e.target.value })}
+            disabled={isLoading}
           />
-          <Button onClick={handleUpdatePost}>게시물 업데이트</Button>
+          <Button onClick={onUpdatePost} disabled={isLoading || !isValid}>
+            {isLoading ? "업데이트 중..." : "게시물 업데이트"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

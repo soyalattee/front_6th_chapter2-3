@@ -1,6 +1,6 @@
 import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, useQueryParams } from "@/shared"
 import { Search } from "lucide-react"
-import { getTags, Tag } from "./apis/postsApis"
+import { getTags, Tag } from "./api/postsApis"
 import { useEffect, useState } from "react"
 
 interface SearchFilterContainerProps {

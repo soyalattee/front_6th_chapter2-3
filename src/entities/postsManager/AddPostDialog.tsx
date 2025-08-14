@@ -1,36 +1,32 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "@/shared"
-import { addPost, Post } from "./apis/postsApis"
-import { useState } from "react"
 
-interface AddPostDialogProps {
-  showAddDialog: boolean
-  setShowAddDialog: (show: boolean) => void
-  posts: Post[]
-  setPosts: (posts: Post[]) => void
-}
-interface CreatePost {
+export interface CreatePostData {
   title: string
   body: string
   userId: number
 }
-export const AddPostDialog = ({ showAddDialog, setShowAddDialog, posts, setPosts }: AddPostDialogProps) => {
-  const [newPost, setNewPost] = useState<CreatePost>({ title: "", body: "", userId: 1 })
 
-  // 게시물 추가
-  const handleAddPost = async () => {
-    try {
-      const newPostData = await addPost(newPost)
-      setPosts([newPostData, ...posts])
-      setShowAddDialog(false)
-      //초기화
-      setNewPost({ title: "", body: "", userId: 1 })
-    } catch (error) {
-      console.error("게시물 추가 오류:", error)
-    }
-  }
+interface AddPostDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  postData: CreatePostData
+  onPostDataChange: (data: CreatePostData) => void
+  onAddPost: () => void
+  isLoading?: boolean
+}
+
+export const AddPostDialog = ({
+  open,
+  onOpenChange,
+  postData,
+  onPostDataChange,
+  onAddPost,
+  isLoading = false,
+}: AddPostDialogProps) => {
+  const isValid = postData.title.trim() !== "" && postData.body.trim() !== ""
 
   return (
-    <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>새 게시물 추가</DialogTitle>
@@ -38,22 +34,27 @@ export const AddPostDialog = ({ showAddDialog, setShowAddDialog, posts, setPosts
         <div className="space-y-4">
           <Input
             placeholder="제목"
-            value={newPost.title}
-            onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+            value={postData.title}
+            onChange={(e) => onPostDataChange({ ...postData, title: e.target.value })}
+            disabled={isLoading}
           />
           <Textarea
             rows={30}
             placeholder="내용"
-            value={newPost.body}
-            onChange={(e) => setNewPost({ ...newPost, body: e.target.value })}
+            value={postData.body}
+            onChange={(e) => onPostDataChange({ ...postData, body: e.target.value })}
+            disabled={isLoading}
           />
           <Input
             type="number"
             placeholder="사용자 ID"
-            value={newPost.userId}
-            onChange={(e) => setNewPost({ ...newPost, userId: Number(e.target.value) })}
+            value={postData.userId}
+            onChange={(e) => onPostDataChange({ ...postData, userId: Number(e.target.value) })}
+            disabled={isLoading}
           />
-          <Button onClick={handleAddPost}>게시물 추가</Button>
+          <Button onClick={onAddPost} disabled={isLoading || !isValid}>
+            {isLoading ? "추가 중..." : "게시물 추가"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

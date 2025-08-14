@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared"
-import { UserInfo } from "./apis/postsApis"
+import { UserInfo } from "../api/userApis"
 
 interface UserDialogProps {
   showUserModal: boolean

@@ -1,4 +1,4 @@
-import { PostWithAuthor } from "@/entities/postsManager/PostsManagerPage"
+import { PostWithAuthor } from "@/entities/postsManager/hooks/usePostActions"
 import { Button, HighlightText, Table, useQueryParams } from "@/shared"
 import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
 
@@ -6,22 +6,12 @@ interface PostsTableProps {
   openPostDetail: (post: PostWithAuthor) => void
   openUserModal: (userId: number) => void
   posts: PostWithAuthor[]
-  setPosts: React.Dispatch<React.SetStateAction<PostWithAuthor[]>>
+  deletePost: (id: number) => Promise<void>
   openEditDialog: (post: PostWithAuthor) => void
 }
 
-export const PostsTable = ({ openPostDetail, openUserModal, openEditDialog, posts, setPosts }: PostsTableProps) => {
+export const PostsTable = ({ openPostDetail, openUserModal, openEditDialog, posts, deletePost }: PostsTableProps) => {
   const { searchQuery, updateURL, setSelectedTag, selectedTag } = useQueryParams()
-
-  // 게시물 삭제
-  const deletePost = async (id: number) => {
-    try {
-      await deletePost(id)
-      setPosts(posts.filter((post) => post.id !== id))
-    } catch (error) {
-      console.error("게시물 삭제 오류:", error)
-    }
-  }
 
   return (
     <Table>
