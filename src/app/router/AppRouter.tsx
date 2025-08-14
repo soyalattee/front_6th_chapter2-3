@@ -1,12 +1,15 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
+import { NuqsAdapter } from "nuqs/adapters/react-router"
 import { PostsManagerPage } from "@/pages"
 
 const AppRouter = () => {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<PostsManagerPage />} />
-      </Routes>
+      <NuqsAdapter>
+        <Routes>
+          <Route path="/" element={<PostsManagerPage />} />
+        </Routes>
+      </NuqsAdapter>
     </BrowserRouter>
   )
 }

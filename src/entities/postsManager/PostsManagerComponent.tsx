@@ -12,7 +12,7 @@ import { usePostActions, PostWithAuthor } from "./hooks/usePostActions"
 import { useUserActions } from "../users/hooks/useUserActions"
 
 export const PostsManagerComponent = () => {
-  const { skip, limit, searchQuery, sortBy, sortOrder, selectedTag, updateURL, setSelectedTag } = useQueryParams()
+  const { skip, limit, searchQuery, sortBy, sortOrder, selectedTag } = useQueryParams()
 
   const {
     posts,
@@ -88,9 +88,8 @@ export const PostsManagerComponent = () => {
       await fetchPosts({ limit, skip })
       return
     }
-    updateURL({ searchQuery })
     await searchPosts(searchQuery)
-  }, [searchQuery, limit, skip, fetchPosts, updateURL, searchPosts])
+  }, [searchQuery, limit, skip, fetchPosts, searchPosts])
 
   // 태그별 게시물 가져오기 핸들러
   const handleFetchPostsByTag = useCallback(
@@ -141,8 +140,7 @@ export const PostsManagerComponent = () => {
     } else {
       fetchPosts({ limit, skip })
     }
-    updateURL()
-  }, [skip, limit, sortBy, sortOrder, selectedTag, handleFetchPostsByTag, fetchPosts, updateURL])
+  }, [skip, limit, sortBy, sortOrder, selectedTag, handleFetchPostsByTag, fetchPosts])
 
   return (
     <Card className="w-full max-w-6xl mx-auto">
@@ -158,12 +156,7 @@ export const PostsManagerComponent = () => {
       <CardContent>
         <div className="flex flex-col gap-4">
           {/* 검색 및 필터 컨트롤 */}
-          <SearchFilterContainer
-            searchPosts={handleSearchPosts}
-            selectedTag={selectedTag}
-            setSelectedTag={setSelectedTag}
-            fetchPostsByTag={handleFetchPostsByTag}
-          />
+          <SearchFilterContainer searchPosts={handleSearchPosts} fetchPostsByTag={handleFetchPostsByTag} />
           {/* 게시물 테이블 */}
           {loading ? (
             <div className="flex justify-center p-4">로딩 중...</div>

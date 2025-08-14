@@ -11,7 +11,7 @@ interface PostsTableProps {
 }
 
 export const PostsTable = ({ openPostDetail, openUserModal, openEditDialog, posts, deletePost }: PostsTableProps) => {
-  const { searchQuery, updateURL, setSelectedTag, selectedTag } = useQueryParams()
+  const { searchQuery, setSelectedTag, selectedTag } = useQueryParams()
 
   return (
     <Table>
@@ -45,7 +45,6 @@ export const PostsTable = ({ openPostDetail, openUserModal, openEditDialog, post
                       }`}
                       onClick={() => {
                         setSelectedTag(tag)
-                        updateURL({ selectedTag: tag })
                       }}
                     >
                       {tag}

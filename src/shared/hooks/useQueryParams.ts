@@ -1,88 +1,83 @@
-import { useEffect, useState, useCallback } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { parseAsInteger, parseAsString, useQueryStates } from "nuqs"
+import { useCallback } from "react"
 
 // TODO: 추후 entities 폴더에 필요에 따라 나눠 이동하고 여기는 파라미터 타입체킹만 놓기
 export interface QueryParamsState {
   skip: number
-  setSkip: React.Dispatch<React.SetStateAction<number>>
+  setSkip: (value: number | null) => void
   limit: number
-  setLimit: React.Dispatch<React.SetStateAction<number>>
+  setLimit: (value: number | null) => void
   searchQuery: string
-  setSearchQuery: React.Dispatch<React.SetStateAction<string>>
+  setSearchQuery: (value: string | null) => void
   sortBy: string
-  setSortBy: React.Dispatch<React.SetStateAction<string>>
+  setSortBy: (value: string | null) => void
   sortOrder: string
-  setSortOrder: React.Dispatch<React.SetStateAction<string>>
+  setSortOrder: (value: string | null) => void
   selectedTag: string
-  setSelectedTag: React.Dispatch<React.SetStateAction<string>>
-  updateURL: (
-    next?: Partial<{
-      skip: number
-      limit: number
-      searchQuery: string
-      sortBy: string
-      sortOrder: string
-      selectedTag: string
-    }>,
-  ) => void
+  setSelectedTag: (value: string | null) => void
 }
 
 export const useQueryParams = (): QueryParamsState => {
-  const navigate = useNavigate()
-  const location = useLocation()
-
-  const queryParams = new URLSearchParams(location.search)
-
-  const [skip, setSkip] = useState<number>(parseInt(queryParams.get("skip") || "0"))
-  const [limit, setLimit] = useState<number>(parseInt(queryParams.get("limit") || "10"))
-  const [searchQuery, setSearchQuery] = useState<string>(queryParams.get("search") || "")
-  const [sortBy, setSortBy] = useState<string>(queryParams.get("sortBy") || "")
-  const [sortOrder, setSortOrder] = useState<string>(queryParams.get("sortOrder") || "asc")
-  const [selectedTag, setSelectedTag] = useState<string>(queryParams.get("tag") || "")
-
-  const updateURL = useCallback(
-    (
-      next?: Partial<{
-        skip: number
-        limit: number
-        searchQuery: string
-        sortBy: string
-        sortOrder: string
-        selectedTag: string
-      }>,
-    ) => {
-      const effective = {
-        skip,
-        limit,
-        searchQuery,
-        sortBy,
-        sortOrder,
-        selectedTag,
-        ...next,
-      }
-
-      const newParams = new URLSearchParams()
-      if (effective.skip) newParams.set("skip", String(effective.skip))
-      if (effective.limit) newParams.set("limit", String(effective.limit))
-      if (effective.searchQuery) newParams.set("search", effective.searchQuery)
-      if (effective.sortBy) newParams.set("sortBy", effective.sortBy)
-      if (effective.sortOrder) newParams.set("sortOrder", effective.sortOrder)
-      if (effective.selectedTag) newParams.set("tag", effective.selectedTag)
-
-      navigate(`?${newParams.toString()}`)
+  // nuqs useQueryStates를 사용해 모든 쿼리 파라미터를 한 번에 관리
+  const [queryParams, setQueryParams] = useQueryStates(
+    {
+      skip: parseAsInteger.withDefault(0),
+      limit: parseAsInteger.withDefault(10),
+      search: parseAsString.withDefault(""),
+      sortBy: parseAsString.withDefault(""),
+      sortOrder: parseAsString.withDefault("asc"),
+      tag: parseAsString.withDefault(""),
     },
-    [skip, limit, searchQuery, sortBy, sortOrder, selectedTag, navigate],
+    {
+      // shallow: false, // URL 변경시 컴포넌트 리렌더링을 제어
+      // throttleMs: 50, // 빠른 연속 업데이트를 제한
+    },
   )
 
-  useEffect(() => {
-    const p = new URLSearchParams(location.search)
-    setSkip(parseInt(p.get("skip") || "0"))
-    setLimit(parseInt(p.get("limit") || "10"))
-    setSearchQuery(p.get("search") || "")
-    setSortBy(p.get("sortBy") || "")
-    setSortOrder(p.get("sortOrder") || "asc")
-    setSelectedTag(p.get("tag") || "")
-  }, [location.search])
+  const { skip, limit, search: searchQuery, sortBy, sortOrder, tag: selectedTag } = queryParams
+
+  // 개별 setter 함수들
+  const setSkip = useCallback(
+    (value: number | null) => {
+      setQueryParams({ skip: value })
+    },
+    [setQueryParams],
+  )
+
+  const setLimit = useCallback(
+    (value: number | null) => {
+      setQueryParams({ limit: value })
+    },
+    [setQueryParams],
+  )
+
+  const setSearchQuery = useCallback(
+    (value: string | null) => {
+      setQueryParams({ search: value })
+    },
+    [setQueryParams],
+  )
+
+  const setSortBy = useCallback(
+    (value: string | null) => {
+      setQueryParams({ sortBy: value })
+    },
+    [setQueryParams],
+  )
+
+  const setSortOrder = useCallback(
+    (value: string | null) => {
+      setQueryParams({ sortOrder: value })
+    },
+    [setQueryParams],
+  )
+
+  const setSelectedTag = useCallback(
+    (value: string | null) => {
+      setQueryParams({ tag: value })
+    },
+    [setQueryParams],
+  )
 
   return {
     skip,
@@ -97,6 +92,5 @@ export const useQueryParams = (): QueryParamsState => {
     setSortOrder,
     selectedTag,
     setSelectedTag,
-    updateURL,
   }
 }

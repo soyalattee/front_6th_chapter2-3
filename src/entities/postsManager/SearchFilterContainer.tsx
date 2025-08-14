@@ -5,15 +5,15 @@ import { useEffect, useState } from "react"
 
 interface SearchFilterContainerProps {
   searchPosts: () => void
-  selectedTag: string
-  setSelectedTag: (tag: string) => void
   fetchPostsByTag: (tag: string) => void
 }
 
-export const SearchFilterContainer = ({ searchPosts, selectedTag, fetchPostsByTag }: SearchFilterContainerProps) => {
-  const [tags, setTags] = useState<Tag[]>([])
-  const { searchQuery, sortBy, sortOrder, updateURL, setSearchQuery, setSortBy, setSortOrder, setSelectedTag } =
+export const SearchFilterContainer = ({ searchPosts, fetchPostsByTag }: SearchFilterContainerProps) => {
+  const { searchQuery, sortBy, sortOrder, setSearchQuery, setSortBy, setSortOrder, selectedTag, setSelectedTag } =
     useQueryParams()
+
+  const [tags, setTags] = useState<Tag[]>([])
+  const [searchValue, setSearchValue] = useState(searchQuery)
 
   // 태그 가져오기
   const fetchTags = async () => {
@@ -22,6 +22,14 @@ export const SearchFilterContainer = ({ searchPosts, selectedTag, fetchPostsByTa
       setTags(tagsData)
     } catch (error) {
       console.error("태그 가져오기 오류:", error)
+    }
+  }
+
+  // 검색 핸들러
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setSearchQuery(searchValue)
+      searchPosts()
     }
   }
 
@@ -37,9 +45,9 @@ export const SearchFilterContainer = ({ searchPosts, selectedTag, fetchPostsByTa
           <Input
             placeholder="게시물 검색..."
             className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && searchPosts()}
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onKeyDown={handleSearch}
           />
         </div>
       </div>
@@ -48,7 +56,6 @@ export const SearchFilterContainer = ({ searchPosts, selectedTag, fetchPostsByTa
         onValueChange={(value) => {
           setSelectedTag(value)
           fetchPostsByTag(value)
-          updateURL({ selectedTag: value })
         }}
       >
         <SelectTrigger className="w-[180px]">
