@@ -21,6 +21,7 @@ export const PostsManagerComponent = () => {
     selectedPost,
     updateSelectedPost,
     loading,
+    error,
     total,
     fetchPosts,
     searchPosts,
@@ -154,6 +155,7 @@ export const PostsManagerComponent = () => {
           {/* 검색 및 필터 컨트롤 */}
           <SearchFilterContainer searchPosts={handleSearchPosts} fetchPostsByTag={handleFetchPostsByTag} />
           {/* 게시물 테이블 */}
+          {error && <div className="text-red-500">{error.message}</div>}
           {loading ? (
             <div className="flex justify-center p-4">로딩 중...</div>
           ) : (
