@@ -1,5 +1,5 @@
 import { api } from "@/shared/api/api"
-import { PostsResponse, TagsResponse, Post } from "../types"
+import { PostsResponse, TagsResponse, Post } from "@/entities/posts/types"
 
 // API 함수
 

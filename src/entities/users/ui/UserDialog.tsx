@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/shared"
-import { UserInfo } from "../types"
+import { UserInfo } from "@/entities/users/types"
 
 interface UserDialogProps {
   open: boolean

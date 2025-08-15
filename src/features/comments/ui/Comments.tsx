@@ -3,8 +3,8 @@ import { Plus } from "lucide-react"
 import { useState } from "react"
 import { Comment } from "@/entities/comments"
 import { useCommentActions } from "@/features/comments/hooks/useCommentActions"
-import { AddCommentDialog } from "./AddCommentDialog"
-import { EditCommentDialog } from "./EditCommentDialog"
+import { AddCommentDialog } from "@/features/comments/ui/AddCommentDialog"
+import { EditCommentDialog } from "@/features/comments/ui/EditCommentDialog"
 import { CommentItem } from "@/entities/comments/ui/CommentItem"
 
 interface CommentsProps {

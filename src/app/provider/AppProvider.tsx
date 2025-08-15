@@ -1,6 +1,6 @@
 import { ReactNode } from "react"
-import { QueryProvider } from "./QueryProvider"
-import { NuqsProvider } from "./NuqsProvider"
+import { QueryProvider } from "@/app/provider/QueryProvider"
+import { NuqsProvider } from "@/app/provider/NuqsProvider"
 
 interface AppProviderProps {
   children: ReactNode

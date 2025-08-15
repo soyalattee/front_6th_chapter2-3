@@ -1,5 +1,5 @@
 import { Button, HighlightText, useQueryParams } from "@/shared"
-import { Comment } from "../types"
+import { Comment } from "@/entities/comments/types"
 import { Edit2, ThumbsUp, Trash2 } from "lucide-react"
 
 interface CommentItemProps {

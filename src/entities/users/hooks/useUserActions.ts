@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { getUserById } from "@/entities/users/api/userApis"
+import { getUserById } from "@/entities/users/api"
 import { QUERY_KEYS } from "@/shared"
 
 export const useUserActions = () => {

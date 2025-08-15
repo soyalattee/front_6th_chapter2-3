@@ -1,5 +1,5 @@
-import { RouterProvider } from "./RouterProvider"
-import { Routes } from "./Routes"
+import { RouterProvider } from "@/app/router/RouterProvider"
+import { Routes } from "@/app/router/Routes"
 
 export const AppRouter = () => {
   return (

@@ -7,7 +7,7 @@ import {
   UpdateCommentRequest,
   DeleteCommentResponse,
   LikeCommentRequest,
-} from "../types"
+} from "@/entities/comments/types"
 
 // 게시물 댓글 가져오기
 export const getCommentsByPostId = async (postId: number): Promise<CommentsResponse> => {
