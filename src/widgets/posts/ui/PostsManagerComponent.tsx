@@ -11,6 +11,7 @@ import { UserDialog } from "@/entities/users/ui/UserDialog"
 import { usePostActions } from "@/features/posts/hooks/usePostActions"
 import { CreatePostData, PostWithAuthor } from "@/features/posts/types"
 import { useUserActions } from "@/entities/users/hooks/useUserActions"
+import { useDialogStore } from "../model"
 
 export const PostsManagerComponent = () => {
   const { skip, limit, searchQuery, selectedTag, sortBy, order } = useQueryParams()
@@ -33,13 +34,23 @@ export const PostsManagerComponent = () => {
 
   const { selectedUser, isLoadingUser, selectUser, clearSelectedUser } = useUserActions()
 
-  // Dialog 상태 관리
-  const [showAddDialog, setShowAddDialog] = useState(false)
-  const [showEditDialog, setShowEditDialog] = useState(false)
-  const [showPostDetailDialog, setShowPostDetailDialog] = useState(false)
-  const [showUserModal, setShowUserModal] = useState(false)
+  // Zustand Dialog Store (다이얼로그 상태만)
+  const {
+    showAddDialog,
+    showEditDialog,
+    showPostDetailDialog,
+    showUserModal,
+    openAddDialog,
+    closeAddDialog,
+    openEditDialog,
+    closeEditDialog,
+    openPostDetailDialog,
+    closePostDetailDialog,
+    openUserModal,
+    closeUserModal,
+  } = useDialogStore()
 
-  // 폼 데이터 상태
+  // 폼 데이터 상태 (로컬 관리)
   const [newPostData, setNewPostData] = useState<CreatePostData>({ title: "", body: "", userId: 1 })
   const [editPostData, setEditPostData] = useState<PostEditData | null>(null)
 
@@ -52,7 +63,7 @@ export const PostsManagerComponent = () => {
 
     try {
       await addPostToList(newPostData)
-      setShowAddDialog(false)
+      closeAddDialog()
       setNewPostData({ title: "", body: "", userId: 1 })
     } catch (error) {
       console.error("게시물 추가 실패:", error)
@@ -73,7 +84,7 @@ export const PostsManagerComponent = () => {
         reactions: editPostData.reactions,
         views: editPostData.views,
       })
-      setShowEditDialog(false)
+      closeEditDialog()
     } catch (error) {
       console.error("게시물 수정 실패:", error)
     }
@@ -101,7 +112,7 @@ export const PostsManagerComponent = () => {
   )
 
   // 게시물 수정 모달 열기
-  const openEditDialog = (post: PostWithAuthor) => {
+  const handleOpenEditDialog = (post: PostWithAuthor) => {
     updateSelectedPost(post)
     setEditPostData({
       id: post.id,
@@ -112,19 +123,19 @@ export const PostsManagerComponent = () => {
       reactions: post.reactions,
       views: post.views,
     })
-    setShowEditDialog(true)
+    openEditDialog()
   }
 
   // 게시물 상세모달 열기
-  const openPostDetail = (post: PostWithAuthor) => {
+  const handleOpenPostDetail = (post: PostWithAuthor) => {
     updateSelectedPost(post)
-    setShowPostDetailDialog(true)
+    openPostDetailDialog()
   }
 
   // 사용자 모달 열기
-  const openUserModal = (userId: number) => {
+  const handleOpenUserModal = (userId: number) => {
     selectUser(userId)
-    setShowUserModal(true)
+    openUserModal()
   }
 
   return (
@@ -132,7 +143,7 @@ export const PostsManagerComponent = () => {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>게시물 관리자</span>
-          <Button onClick={() => setShowAddDialog(true)}>
+          <Button onClick={openAddDialog}>
             <Plus className="w-4 h-4 mr-2" />
             게시물 추가
           </Button>
@@ -149,9 +160,9 @@ export const PostsManagerComponent = () => {
             <PostsTable
               posts={posts}
               deletePost={deletePostFromList}
-              openPostDetail={openPostDetail}
-              openUserModal={openUserModal}
-              openEditDialog={openEditDialog}
+              openPostDetail={handleOpenPostDetail}
+              openUserModal={handleOpenUserModal}
+              openEditDialog={handleOpenEditDialog}
             />
           )}
 
@@ -163,7 +174,11 @@ export const PostsManagerComponent = () => {
       {/* 게시물 추가 대화상자 */}
       <AddPostDialog
         open={showAddDialog}
-        onOpenChange={setShowAddDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeAddDialog()
+          }
+        }}
         postData={newPostData}
         onPostDataChange={setNewPostData}
         onAddPost={handleAddPost}
@@ -173,7 +188,11 @@ export const PostsManagerComponent = () => {
       {/* 게시물 수정 대화상자 */}
       <EditPostDialog
         open={showEditDialog}
-        onOpenChange={setShowEditDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            closeEditDialog()
+          }
+        }}
         post={editPostData}
         onPostChange={setEditPostData}
         onUpdatePost={handleUpdatePost}
@@ -184,7 +203,11 @@ export const PostsManagerComponent = () => {
       {selectedPost && (
         <PostDetailDialog
           showPostDetailDialog={showPostDetailDialog}
-          setShowPostDetailDialog={setShowPostDetailDialog}
+          setShowPostDetailDialog={(show) => {
+            if (!show) {
+              closePostDetailDialog()
+            }
+          }}
           selectedPost={selectedPost}
         />
       )}
@@ -193,8 +216,8 @@ export const PostsManagerComponent = () => {
       <UserDialog
         open={showUserModal}
         onOpenChange={(open) => {
-          setShowUserModal(open)
           if (!open) {
+            closeUserModal()
             clearSelectedUser()
           }
         }}
