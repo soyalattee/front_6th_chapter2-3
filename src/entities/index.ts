@@ -1,1 +1,3 @@
-export { PostsManagerComponent } from "./postsManager/PostsManagerComponent"
+export * from "./posts"
+export * from "./users"
+export * from "./comments"

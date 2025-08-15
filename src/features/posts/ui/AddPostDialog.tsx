@@ -1,10 +1,5 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea } from "@/shared"
-
-export interface CreatePostData {
-  title: string
-  body: string
-  userId: number
-}
+import { CreatePostData } from "@/features/posts/types"
 
 interface AddPostDialogProps {
   open: boolean

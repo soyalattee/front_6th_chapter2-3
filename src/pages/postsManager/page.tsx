@@ -1,5 +1,5 @@
 import { Layout } from "@/widgets"
-import { PostsManagerComponent } from "@/entities"
+import { PostsManagerComponent } from "@/widgets/posts/ui/PostsManagerComponent"
 
 export const PostsManagerPage = () => {
   return (

@@ -1,28 +1,9 @@
 import { useState, useCallback } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Post, getPosts, getPostsBySearch, getPostsByTag, addPost, updatePost, deletePost } from "../api/postsApis"
-import { User, getUsers } from "@/entities/users/api/userApis"
+import { Post, getPosts, getPostsBySearch, getPostsByTag, addPost, updatePost, deletePost } from "@/entities/posts"
+import { getUsers } from "@/entities/users"
 import { QUERY_KEYS } from "@/shared"
-
-export interface PostWithAuthor extends Post {
-  author?: User
-}
-
-export interface CreatePostData {
-  title: string
-  body: string
-  userId: number
-}
-
-interface PostsQueryResult {
-  posts: PostWithAuthor[]
-  total: number
-}
-
-interface MutationContext {
-  previousPosts?: PostsQueryResult
-  tempId?: number
-}
+import { PostWithAuthor, CreatePostData, PostsQueryResult, MutationContext } from "@/features/posts/types"
 
 export const usePostActions = (params: {
   limit: number

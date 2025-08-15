@@ -1,0 +1,6 @@
+export * from "./PostsTable"
+export * from "./SearchFilterContainer"
+export * from "./Paginations"
+export * from "./AddPostDialog"
+export * from "./EditPostDialog"
+export * from "../../../widgets/posts/ui/PostDetailDialog"

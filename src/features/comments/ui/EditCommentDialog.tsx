@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } from "@/shared"
-import { Comment } from "../api/commentsApis"
+import { Comment } from "@/entities/comments"
 
 interface EditCommentDialogProps {
   open: boolean

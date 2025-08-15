@@ -1,4 +1,4 @@
-import { PostWithAuthor } from "@/entities/postsManager/hooks/usePostActions"
+import { PostWithAuthor } from "@/features/posts/types"
 import { Button, HighlightText, Table, useQueryParams } from "@/shared"
 import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
 

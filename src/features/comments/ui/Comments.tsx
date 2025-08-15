@@ -1,11 +1,11 @@
 import { Button } from "@/shared"
 import { Plus } from "lucide-react"
 import { useState } from "react"
-import { Comment } from "../api/commentsApis"
-import { useCommentActions } from "../hooks/useCommentActions"
+import { Comment } from "@/entities/comments"
+import { useCommentActions } from "@/features/comments/hooks/useCommentActions"
 import { AddCommentDialog } from "./AddCommentDialog"
 import { EditCommentDialog } from "./EditCommentDialog"
-import { CommentItem } from "./CommentItem"
+import { CommentItem } from "@/entities/comments/ui/CommentItem"
 
 interface CommentsProps {
   postId: number

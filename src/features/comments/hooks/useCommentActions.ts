@@ -8,7 +8,7 @@ import {
   updateComment,
   addComment,
   AddCommentRequest,
-} from "../api/commentsApis"
+} from "@/entities/comments"
 import { QUERY_KEYS } from "@/shared"
 
 export const useCommentActions = (postId: number) => {

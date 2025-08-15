@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { getTags } from "../api/postsApis"
+import { getTags } from "@/entities/posts"
 import { QUERY_KEYS } from "@/shared"
 
 export const useTagActions = () => {

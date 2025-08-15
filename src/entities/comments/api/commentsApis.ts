@@ -1,47 +1,14 @@
 import { api } from "@/shared/api/api"
+import {
+  Comment,
+  CommentsResponse,
+  AddCommentRequest,
+  AddCommentResponse,
+  UpdateCommentRequest,
+  DeleteCommentResponse,
+  LikeCommentRequest,
+} from "../types"
 
-export interface CommentUser {
-  id: number
-  username: string
-  fullName: string
-}
-
-export interface Comment {
-  id: number
-  body: string
-  likes: number
-  postId: number
-  user: CommentUser
-}
-
-export interface CommentsResponse {
-  comments: Comment[]
-  limit: number
-  skip: number
-  total: number
-}
-
-export interface AddCommentResponse {
-  id: number
-  body: string
-  postId: number
-  user: CommentUser
-}
-export interface DeleteCommentResponse {
-  isDeleted: boolean
-}
-
-export interface UpdateCommentRequest {
-  body: string
-}
-export interface AddCommentRequest {
-  body: string
-  postId: number
-  userId: number
-}
-export interface LikeCommentRequest {
-  likes: number
-}
 // 게시물 댓글 가져오기
 export const getCommentsByPostId = async (postId: number): Promise<CommentsResponse> => {
   return api.get<CommentsResponse>(`/comments/post/${postId}`)

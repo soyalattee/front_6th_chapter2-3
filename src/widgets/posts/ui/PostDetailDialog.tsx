@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, useQueryParams } from "@/shared"
 import { HighlightText } from "@/shared"
-import { Comments } from "../comments/ui/Comments"
-import { PostWithAuthor } from "./hooks/usePostActions"
+import { Comments } from "@/features/comments/ui/Comments"
+import { PostWithAuthor } from "@/features/posts/types"
 
 interface PostDetailDialogProps {
   showPostDetailDialog: boolean
